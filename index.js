@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 
-class SwapAutomation {
+class SwapCoinAutomation {
   constructor() {
     this.browser = null;
     this.page = null;
@@ -15,19 +15,16 @@ class SwapAutomation {
 
   async createPage() {
     this.page = await this.browser.newPage();
-    // await this.page.exposeFunction("getItem", (a) => {
-    //   console.log(a);
-    // });
   }
 
   async goToPage(url) {
     await this.page.goto(url);
   }
 
-  async searchAndSelect(tokenName, inputSelector, childNum = 0) {
-    await this.page.waitForSelector(inputSelector);
-    await this.page.type(inputSelector, tokenName, { delay: 100 });
-    await this.page.waitForTimeout(1500);
+  async searchAndSelect(tokenName, searchSelector, childNum = 0) {
+    await this.page.waitForSelector(searchSelector);
+    await this.page.type(searchSelector, tokenName, { delay: 100 });
+    await new Promise((r) => setTimeout(r, 1500));
 
     if (childNum === 0) {
       this.page.keyboard.press("Enter");
@@ -47,27 +44,25 @@ class SwapAutomation {
     await this.page.type(inputSelector, amount.toString());
   }
 
-  async performSwap(
-    sellAmount,
-    sellInputSelector,
-    elSelector,
-    buyTokenName,
-    buyInputSelector,
-    route = 0
-  ) {
+  async performCoinSwap(selector, tokenName, route = 0, sellAmount = 0) {
+    const searchSelector = 'input[placeholder="Search... (Symbol or Address)"]';
+    const inputSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${selector}) > div.css-1k491an > div > input`;
+    const btnSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${selector}) > div.css-1k491an > button`;
+
     if (sellAmount !== 0) {
-      await this.enterAmount(sellAmount, sellInputSelector);
+      await this.enterAmount(sellAmount, inputSelector);
     }
-    await this.page.click(elSelector);
+    await this.page.click(btnSelector);
 
     if (route === 1) {
-      await this.searchAndSelect(buyTokenName, buyInputSelector, 2);
-      await this.page.waitForTimeout(7000);
+      await this.searchAndSelect(tokenName, searchSelector, 2);
+      await new Promise((r) => setTimeout(r, 5000));
       await this.page.click(
         "#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-2.fcGAPg > div:nth-child(5)"
       );
     } else {
-      await this.searchAndSelect(buyTokenName, buyInputSelector, 1);
+      await this.searchAndSelect(tokenName, searchSelector, 1);
+      await new Promise((r) => setTimeout(r, 1500));
     }
   }
 
@@ -80,29 +75,13 @@ class SwapAutomation {
 
       await this.searchAndSelect("arbi", "#react-select-2-input");
 
-      await this.performSwap(
-        12,
-        "#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(1) > div.css-1k491an > div > input",
-        "#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(1) > div.css-1k491an > button",
-        "wbtc",
-        'input[placeholder="Search... (Symbol or Address)"]'
-      );
-
-      await this.performSwap(
-        0,
-        "#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(3) > div.css-1k491an > div > input",
-        "#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(3) > div.css-1k491an > button",
-        "usd coin",
-        'input[placeholder="Search... (Symbol or Address)"]',
-        1
-      );
-
-      await this.page.waitForTimeout(5000);
+      await this.performCoinSwap(1, "wbtc", 0, 12);
+      await this.performCoinSwap(3, "usd coin", 1);
     } catch (error) {
-    } finally {
+      console.log(error);
     }
   }
 }
 
-const swapAutomation = new SwapAutomation();
-swapAutomation.run();
+const swapCoinAutomation = new SwapCoinAutomation();
+swapCoinAutomation.run();

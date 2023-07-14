@@ -1,7 +1,7 @@
 
 # COIN SWAP AUTOMATION
 
-This project demonstrates an automation script built with Puppeteer to perform swaps on the "https://swap.defillama.com/" website.
+This project demonstrates an automation script built with Puppeteer to perform swaps on the [swap.defillama.com](https://swap.defillama.com/) website.
 
 ## Prerequisites
 

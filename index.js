@@ -21,16 +21,16 @@ class SwapCoinAutomation {
     await this.page.goto(url);
   }
 
-  async searchAndSelect(tokenName, searchSelector, childNum = 0) {
+  async searchAndSelect(name, searchSelector, child = 0) {
     await this.page.waitForSelector(searchSelector);
-    await this.page.type(searchSelector, tokenName, { delay: 100 });
+    await this.page.type(searchSelector, name, { delay: 100 });
     await new Promise((r) => setTimeout(r, 1500));
 
-    if (childNum === 0) {
+    if (child === 0) {
       this.page.keyboard.press("Enter");
     } else {
       this.page.click(
-        `section[role = "dialog"] > div.List > div > div:nth-child(${childNum})`
+        `section[role = "dialog"] > div.List > div > div:nth-child(${child})`
       );
     }
   }
@@ -44,17 +44,17 @@ class SwapCoinAutomation {
     await this.page.type(inputSelector, amount.toString());
   }
 
-  async performCoinSwap(selector, tokenName, route = 0, sellAmount = 0) {
+  async performCoinSwap(child, tokenName, option = 0, sellAmount = 0) {
     const searchSelector = 'input[placeholder="Search... (Symbol or Address)"]';
-    const inputSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${selector}) > div.css-1k491an > div > input`;
-    const btnSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${selector}) > div.css-1k491an > button`;
+    const inputSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${child}) > div.css-1k491an > div > input`;
+    const btnSelector = `#__next > div > div > div.sc-889ee977-0.gCbopq > main > div.sc-55ee4011-1.cZHlms > div.sc-55ee4011-3.dlZmAt > div.sc-55ee4011-0.iXoIVV > div.css-1urcov8 > div:nth-child(${child}) > div.css-1k491an > button`;
 
     if (sellAmount !== 0) {
       await this.enterAmount(sellAmount, inputSelector);
     }
     await this.page.click(btnSelector);
 
-    if (route === 1) {
+    if (option === 1) {
       await this.searchAndSelect(tokenName, searchSelector, 2);
       await new Promise((r) => setTimeout(r, 5000));
       await this.page.click(
